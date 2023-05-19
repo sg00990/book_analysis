@@ -1,0 +1,90 @@
+---
+title: "Book Analysis"
+author: "Sarah Graddy"
+date: "2023-05-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+Since middle school, my love for books has been immense. Now, equipped with data analysis skills, I find myself pondering a few questions:
+
+* Which authors have the highest number of ratings?
+* Which book on GoodReads has the highest rating and review count?
+
+
+## Preparing the Data
+
+The first thing I did was import all the packages that I needed.
+
+```{r echo=T, message=FALSE, warning=FALSE, results='hide'}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(ggplot2)
+
+#library(lemon)
+#knit_print.data.frame <- lemon_print
+```
+
+
+After that, I read in the books.csv file from [Goodreads-books](https://www.kaggle.com/datasets/jealousleopard/goodreadsbooks/code) on Kaggle. As of May 2023, this data set has 1,645 upvotes and was last updated three years ago.
+
+```{r}
+books <- read.csv("~/Downloads/books.csv", stringsAsFactors = FALSE)
+```
+
+After thoroughly examining the dataset, I did not come across any NULL values that would impact the analysis. I proceeded to explore the dataset further and discovered twelve columns that provide detailed information about each book. These columns include the book ID, title, author, rating, ISBN numbers, language, page count, written review count, publication date, and the publisher. Impressively, the dataset comprises a total of 11,131 rows, offering a comprehensive collection of books to analyze.
+
+```{r null values}
+is.null(books)
+glimpse(books)
+```
+
+## Results
+
+#### Question 1: Which authors have the highest number of ratings?
+
+Given the vast number of authors in this extensive data set, I have narrowed down the scope to highlight three individuals in response to this specific inquiry. To identify the author with the most ratings, I employed the top_n() function, which enabled me to extract the top three authors based on their overall rating count. To visualize the findings, I have generated a comprehensive bar graph presenting the data in a clear and concise manner. Here is the bar graph that I created from the data:
+
+```{r plot1}
+top_n(books, n=3, ratings_count) %>% 
+  ggplot(., mapping=aes(x=reorder(authors, -ratings_count), y=ratings_count)) + geom_bar(stat='identity', fill='plum3') +
+  labs(title="Top 3 Authors with the Most Ratings", x="Top Authors", y="Number of Ratings") +
+  theme(plot.title=element_text(face='bold', size=18), axis.title.x=element_text(face="bold"), axis.title.y=element_text(face="bold"))
+
+```
+
+In this data set, the authors with the highest number of ratings are Stephenie Meyer, J.R.R. Tolkien, and J.D. Salinger. It's important to note that the rating count alone does not necessarily indicate the popularity or likability of a book, as ratings can be both positive and negative.
+
+#### Question 2: Which book on GoodReads has the highest rating and review count?
+
+Once again, there are a LOT of books listed in this data set. To avoid clutter, I only have the first ten rows displayed. Here is the table:
+
+```{r}
+q2 <- books %>% 
+  arrange(desc(ratings_count)) %>% 
+  slice(1:10)
+q2 <- q2 %>% 
+  arrange(desc(average_rating))
+q2_result <- select(q2,title, authors)
+print(q2_result[,1])
+```
+```{r}
+print(q2_result[,2])
+```
+
+The top four books on the list are all part of the Harry Potter series by J.K. Rowling. Taking the fifth position is the esteemed author J.R.R. Tolkien. While I previously mentioned that higher ratings don't always correlate with more ratings, the table contradicts that statement. It includes books from all three authors that received the highest number of ratings, proving my previous claim to be incorrect in this scenario.
+
+## Conclusion
+
+I was able to find the answers to both of my questions through analysis. 
+
+* The authors with the most ratings are Stephenie Meyer, J.R.R. Tolkien and J.D. Salinger
+* The book with the highest rating and review count is "Harry Potter and the Half-Blood Prince" by J.K. Rowling
+
+While conducting this analysis, I encountered a few limitations. Firstly, this was my first experience using R for data analysis and visualization. Although there might have been alternative approaches, I found the process enjoyable overall. Additionally, I limited the displayed data to a selected number of columns, which sufficed for this particular analysis. However, it's worth noting that broader questions may yield different results that could impact the overall picture. Lastly, it's important to acknowledge that the data set used in this analysis is slightly outdated, with the latest publication date being 2010. This factor likely influenced the outcomes obtained.
