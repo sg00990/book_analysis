@@ -32,6 +32,7 @@ q2 <- q2 %>%
   arrange(desc(average_rating))
 
 q2_result <- select(q2,title, authors)
-print(q2_result)
+print(q2_result[,1])
+print(q2_result[,2])
 
 
